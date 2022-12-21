@@ -39,36 +39,3 @@ realclean: clean
 
 wheel:
 	$(PYTHON) setup.py bdist_wheel $(WITH_CYTHON)
-
-qemu-user-static:
-	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-wheel_manylinux: $(addprefix wheel_,$(MANYLINUX_IMAGES))
-$(addprefix wheel_,$(filter-out %_x86_64, $(filter-out %_i686, $(MANYLINUX_IMAGES)))): qemu-user-static
-
-wheel_%: dist/lupa-$(VERSION).tar.gz
-	@echo "Building $(subst wheel_,,$@) wheels for Lupa $(VERSION)"
-	mkdir -p wheelhouse_$(subst wheel_,,$@)
-	time docker run --rm -t \
-		-v $(shell pwd):/io \
-		-e CFLAGS="-O3 -g0 -mtune=generic -pipe -fPIC -flto" \
-		-e LDFLAGS="$(LDFLAGS) -fPIC -flto" \
-		-e LD=gcc-ld \
-		-e AR=gcc-ar \
-		-e NM=gcc-nm \
-		-e RANLIB=gcc-ranlib \
-		-e LUPA_USE_BUNDLE=$(USE_BUNDLE) \
-		-e WHEELHOUSE=wheelhouse_$(subst wheel_,,$@) \
-		quay.io/pypa/$(subst wheel_,,$@) \
-		bash -c 'echo "Python versions: $$(ls /opt/python/ | xargs -n 100 echo)" ; \
-			for PYBIN in /opt/python/$(PYTHON_BUILD_VERSION)/bin; do \
-				$$PYBIN/python -V; \
-				{ time $$PYBIN/pip wheel -v -w /io/$$WHEELHOUSE /io/$< & } ; \
-			done; wait; \
-			for whl in /io/$$WHEELHOUSE/lupa-$(VERSION)-*-linux_*.whl; do auditwheel repair $$whl -w /io/$$WHEELHOUSE; done; \
-			for whl in /io/$$WHEELHOUSE/lupa-$(VERSION)-*-m*linux*.whl; do \
-				pyver=$${whl#*/lupa-$(VERSION)-}; pyver=$${pyver%%-m*}; \
-				echo "Installing in $${pyver}: $${whl}"; \
-				/opt/python/$${pyver}/bin/python -m pip install -U $${whl} && /opt/python/$${pyver}/bin/python -c "import lupa" || exit 1; \
-				/opt/python/$${pyver}/bin/python -m pip uninstall -y lupa; \
-			done; true'
