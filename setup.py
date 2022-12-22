@@ -131,8 +131,8 @@ def lua_libs(package='luajit'):
 
 
 def get_lua_build_from_arguments():
-    lua_lib = get_option('--lua-lib')
-    lua_includes = get_option('--lua-includes')
+    lua_lib = get_option('--lua-lib', "third-party/lua54/src/")
+    lua_includes = get_option('--lua-includes', "third-party/lua54/src/")
 
     if not lua_lib or not lua_includes:
         return []
@@ -316,12 +316,12 @@ def use_bundled_lua(path, macros):
     }
 
 
-def get_option(name):
+def get_option(name, default=""):
     for i, arg in enumerate(sys.argv[1:-1], 1):
         if arg == name:
             sys.argv.pop(i)
             return sys.argv.pop(i)
-    return ""
+    return default
 
 
 def has_option(name):
