@@ -478,6 +478,22 @@ cdef class LuaRuntime:
         finally:
             lua.lua_settop(L, old_top)
             unlock_runtime(self)
+    
+    def set_global(self, name, obj):
+        """Register Python object 'obj' as a global variable with name.
+        """
+        assert self._state is not NULL
+        cdef lua_State *L = self._state
+        lock_runtime(self)
+        old_top = lua.lua_gettop(L)
+        try:
+            check_lua_stack(L, 1)
+            py_to_lua_custom(self, L, obj, 0)           # obj
+            lua.lua_setglobal(L, (<unicode>name).encode(self._source_encoding))
+            return 0
+        finally:
+            lua.lua_settop(L, old_top)
+            unlock_runtime(self)
 
     @cython.final
     cdef int register_py_object(self, bytes cname, bytes pyname, object obj) except -1:
@@ -2173,7 +2189,7 @@ cdef int py_args_with_gil(PyObject* runtime_obj, lua_State* L) with gil:
     except:
         try: runtime.store_raised_exception(L, b'error while calling python.args()')
         finally: return -1
-
+z
 cdef int py_args(lua_State* L) nogil:
     cdef PyObject* runtime
     runtime = <PyObject*>lua.lua_touserdata(L, lua.lua_upvalueindex(1))
