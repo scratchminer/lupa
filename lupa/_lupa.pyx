@@ -2189,7 +2189,7 @@ cdef int py_args_with_gil(PyObject* runtime_obj, lua_State* L) with gil:
     except:
         try: runtime.store_raised_exception(L, b'error while calling python.args()')
         finally: return -1
-z
+
 cdef int py_args(lua_State* L) nogil:
     cdef PyObject* runtime
     runtime = <PyObject*>lua.lua_touserdata(L, lua.lua_upvalueindex(1))

@@ -131,8 +131,8 @@ def lua_libs(package='luajit'):
 
 
 def get_lua_build_from_arguments():
-    lua_lib = get_option('--lua-lib', "third-party/lua54/src/")
-    lua_includes = get_option('--lua-includes', "third-party/lua54/src/")
+    lua_lib = get_option('--lua-lib')
+    lua_includes = get_option('--lua-includes')
 
     if not lua_lib or not lua_includes:
         return []
@@ -316,12 +316,12 @@ def use_bundled_lua(path, macros):
     }
 
 
-def get_option(name, default=""):
+def get_option(name):
     for i, arg in enumerate(sys.argv[1:-1], 1):
         if arg == name:
             sys.argv.pop(i)
             return sys.argv.pop(i)
-    return default
+    return ""
 
 
 def has_option(name):
@@ -350,7 +350,7 @@ configs = get_lua_build_from_arguments()
 if not configs and not option_no_bundle:
     configs = [
         use_bundled_lua(lua_bundle_path, c_defines)
-        for lua_bundle_path in glob.glob(os.path.join(basedir, 'third-party', 'lua*' + os.sep))
+        for lua_bundle_path in glob.glob(os.path.join(basedir, 'third-party', 'lua*', "src" + os.sep))
         if not (
             False
             # LuaJIT 2.0 on macOS requires a CPython linked with "-pagezero_size 10000 -image_base 100000000"
