@@ -275,9 +275,15 @@ cdef class LuaRuntime:
             if attribute_filter and (getter is not None or setter is not None):
                 raise ValueError("attribute_filter and attribute_handlers are mutually exclusive")
             self._attribute_getter, self._attribute_setter = getter, setter
-
-        lua.luaL_openlibs(L)
-        self.init_python_lib(register_eval, register_builtins)
+        
+        # no package, io, or os libraries!
+        lua.luaL_requiref(L, "_G", lua.luaopen_base, 1)
+        lua.luaL_requiref(L, "coroutine", lua.luaopen_coroutine, 1)
+        lua.luaL_requiref(L, "string", lua.luaopen_string, 1)
+        lua.luaL_requiref(L, "utf8", lua.luaopen_utf8, 1)
+        lua.luaL_requiref(L, "table", lua.luaopen_table, 1)
+        lua.luaL_requiref(L, "math", lua.luaopen_math, 1)
+        lua.luaL_requiref(L, "debug", lua.luaopen_debug, 1)
         lua.lua_atpanic(L, <lua.lua_CFunction>1)
 
         self.set_overflow_handler(overflow_handler)
