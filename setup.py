@@ -255,6 +255,7 @@ def use_bundled_luajit(path, macros):
 
 def use_bundled_lua(path, macros):
     libname = os.path.basename(path.rstrip(os.sep))
+    
     if 'luajit' in libname:
         return use_bundled_luajit(path, macros)
 
@@ -344,13 +345,13 @@ if has_option('--with-lua-checks'):
 # find Lua
 option_no_bundle = has_option('--no-bundle')
 option_use_bundle = has_option('--use-bundle')
-option_no_luajit = has_option('--no-luajit')
+option_no_luajit = has_option('--no-lua-jit')
 
 configs = get_lua_build_from_arguments()
 if not configs and not option_no_bundle:
     configs = [
         use_bundled_lua(lua_bundle_path, c_defines)
-        for lua_bundle_path in glob.glob(os.path.join(basedir, 'third-party', 'lua*', "src" + os.sep))
+        for lua_bundle_path in glob.glob(os.path.join(basedir, 'third-party', 'lua*'))
         if not (
             False
             # LuaJIT 2.0 on macOS requires a CPython linked with "-pagezero_size 10000 -image_base 100000000"
@@ -367,7 +368,6 @@ if not configs and not option_use_bundle:
 if not configs:
     configs = no_lua_error()
 
-
 # check if Cython is installed, and use it if requested or necessary
 def prepare_extensions(use_cython=True):
     ext_modules = []
@@ -380,7 +380,6 @@ def prepare_extensions(use_cython=True):
                 f_out.write(b'#######  DO NOT EDIT - BUILD TIME COPY OF "_lupa.pyx" #######\n\n')
                 with open(src, 'rb') as f_in:
                     shutil.copyfileobj(f_in, f_out)
-
         libs = config.get('ext_libraries')
         ext_modules.append(Extension(
             'lupa.' + ext_name,

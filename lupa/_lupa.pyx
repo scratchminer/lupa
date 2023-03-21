@@ -277,13 +277,13 @@ cdef class LuaRuntime:
             self._attribute_getter, self._attribute_setter = getter, setter
         
         # no package, io, or os libraries!
-        lua.luaL_requiref(L, "_G", lua.luaopen_base, 1)
-        lua.luaL_requiref(L, "coroutine", lua.luaopen_coroutine, 1)
-        lua.luaL_requiref(L, "string", lua.luaopen_string, 1)
-        lua.luaL_requiref(L, "utf8", lua.luaopen_utf8, 1)
-        lua.luaL_requiref(L, "table", lua.luaopen_table, 1)
-        lua.luaL_requiref(L, "math", lua.luaopen_math, 1)
-        lua.luaL_requiref(L, "debug", lua.luaopen_debug, 1)
+        lua.luaL_requiref(L, "_G", <lua.lua_CFunction>lua.luaopen_base, 1)
+        lua.luaL_requiref(L, "coroutine", <lua.lua_CFunction>lua.luaopen_coroutine, 1)
+        lua.luaL_requiref(L, "string", <lua.lua_CFunction>lua.luaopen_string, 1)
+        lua.luaL_requiref(L, "utf8", <lua.lua_CFunction>lua.luaopen_utf8, 1)
+        lua.luaL_requiref(L, "table", <lua.lua_CFunction>lua.luaopen_table, 1)
+        lua.luaL_requiref(L, "math", <lua.lua_CFunction>lua.luaopen_math, 1)
+        lua.luaL_requiref(L, "debug", <lua.lua_CFunction>lua.luaopen_debug, 1)
         lua.lua_atpanic(L, <lua.lua_CFunction>1)
 
         self.set_overflow_handler(overflow_handler)

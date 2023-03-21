@@ -180,7 +180,7 @@ cdef extern from "lua.h" nogil:
 
     void lua_pop(lua_State *L, int n)    # lua_settop(L, -(n)-1)
     void lua_newtable(lua_State *L)      # lua_createtable(L, 0, 0)
-    void  lua_register(lua_State *L, char* n, lua_CFunction f) # (lua_pushcfunction(L, (f)), lua_setglobal(L, (n)))
+    void lua_register(lua_State *L, char* n, lua_CFunction f) # (lua_pushcfunction(L, (f)), lua_setglobal(L, (n)))
     void lua_pushcfunction(lua_State *L, lua_CFunction fn) # lua_pushcclosure(L, (f), 0)
     size_t lua_strlen(lua_State *L, int i) # lua_objlen(L, (i))
 
@@ -286,7 +286,8 @@ cdef extern from "lauxlib.h" nogil:
     ctypedef struct luaL_Reg:
         char *name
         lua_CFunction func
-
+    
+    void luaL_requiref (lua_State *L, const char *modname, lua_CFunction openf, int glb);
     void luaL_register (lua_State *L, char *libname, luaL_Reg *l)
     void luaL_setfuncs (lua_State *L, luaL_Reg *l, int nup)  # 5.2+
     int luaL_getmetafield (lua_State *L, int obj, char *e)
@@ -409,16 +410,16 @@ cdef extern from "lualib.h":
     char* LUA_BITLIBNAME  # "bit"
     char* LUA_JITLIBNAME  # "jit"
 
-    int luaopen_base(lua_State *L)
-    int luaopen_math(lua_State *L)
-    int luaopen_string(lua_State *L)
-    int luaopen_table(lua_State *L)
-    int luaopen_io(lua_State *L)
-    int luaopen_os(lua_State *L)
-    int luaopen_package(lua_State *L)
-    int luaopen_debug(lua_State *L)
-    int luaopen_bit(lua_State *L)
-    int luaopen_jit(lua_State *L)
+    int luaopen_base(lua_State *L) nogil
+    int luaopen_coroutine(lua_State *L) nogil
+    int luaopen_math(lua_State *L) nogil
+    int luaopen_string(lua_State *L) nogil
+    int luaopen_table(lua_State *L) nogil
+    int luaopen_io(lua_State *L) nogil
+    int luaopen_os(lua_State *L) nogil
+    int luaopen_package(lua_State *L) nogil
+    int luaopen_utf8(lua_State *L) nogil
+    int luaopen_debug(lua_State *L) nogil
 
     void luaL_openlibs(lua_State *L)
 
