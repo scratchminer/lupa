@@ -1,20 +1,14 @@
 # Build/test processes
 
 .tox
-.idea
-build
-dist
-MANIFEST
+build/
+dist/
+MANIFEST.in
 *.pyc
 *.pyd
 *.dll
-*.egg-info
+*.egg-info/
 *.so
 *.c
-*.patch
-wheel*/
 lupa/version.py
 lupa/lua*.pyx
-
-# Vim swapfiles
-*.swp
