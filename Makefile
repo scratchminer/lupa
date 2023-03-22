@@ -8,7 +8,7 @@ PYTHON_BUILD_VERSION?=*
 all: local
 
 local:
-	${PYTHON} setup.py build_ext $(WITH_CYTHON) --no-lua-jit --use-bundle
+	${PYTHON} setup.py bdist_wheel $(WITH_CYTHON) --no-lua-jit --use-bundle
 
 test: local
 	PYTHONPATH=. $(PYTHON) -m unittest lupa.tests.test
