@@ -610,7 +610,7 @@ cdef int check_lua_stack(lua_State* L, int extra) except -1:
     return 0
 
 
-cdef int get_object_length_from_lua(lua_State* L) nogil:
+cdef int get_object_length_from_lua(lua_State* L) noexcept nogil:
     cdef size_t length = lua.lua_objlen(L, lua.lua_upvalueindex(1))
     lua.lua_pushlightuserdata(L, <void*>length)
     return 1
@@ -717,7 +717,7 @@ cdef tuple _fix_args_kwargs(tuple args):
 cdef inline bint lock_runtime(LuaRuntime runtime) with gil:
     return lock_lock(runtime._lock, pythread.PyThread_get_thread_ident(), True)
 
-cdef inline void unlock_runtime(LuaRuntime runtime) nogil:
+cdef inline void unlock_runtime(LuaRuntime runtime) noexcept nogil:
     unlock_lock(runtime._lock)
 
 
@@ -2196,7 +2196,7 @@ cdef int py_args_with_gil(PyObject* runtime_obj, lua_State* L) with gil:
         try: runtime.store_raised_exception(L, b'error while calling python.args()')
         finally: return -1
 
-cdef int py_args(lua_State* L) nogil:
+cdef int py_args(lua_State* L) noexcept nogil:
     cdef PyObject* runtime
     runtime = <PyObject*>lua.lua_touserdata(L, lua.lua_upvalueindex(1))
     if not runtime:
@@ -2309,7 +2309,7 @@ cdef void luaL_openlib(lua_State *L, const char *libname,
 
 # internal Lua functions meant to be called in protected mode
 
-cdef int get_from_lua_table(lua_State* L) nogil:
+cdef int get_from_lua_table(lua_State* L) noexcept nogil:
     """Equivalent to the following Lua function:
     function(t, k) return t[k] end
     """
